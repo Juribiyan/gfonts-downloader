@@ -1,0 +1,20 @@
+{
+  "name": "gfonts-downloader",
+  "version": "1.0.0",
+  "description": "Google Fonts downloader and CSS generator",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "google-fonts",
+    "cli"
+  ],
+  "author": "Juribiyan",
+  "license": "MIT",
+  "type": "module",
+  "dependencies": {
+    "node-fetch": "^3.3.2",
+    "yargs": "^17.7.2"
+  }
+}
