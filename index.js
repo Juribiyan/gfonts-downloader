@@ -1,9 +1,13 @@
 import fetch from 'node-fetch'
-import yargs from 'yargs'
-import { hideBin } from 'yargs/helpers'
-const argv = yargs(hideBin(process.argv)).argv
 import {createWriteStream} from 'fs'
-import {access, mkdir, writeFile} from 'fs/promises'
+import {access, mkdir, readFile, writeFile} from 'fs/promises'
+
+const args = process.argv.slice(2)
+let arg = args?.[0]
+if (!arg) {
+	console.error('Please provide a link to CSS or a text file')
+	process.exit(1)
+}
 
 const userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36"
 
@@ -38,8 +42,15 @@ async function downloadFile(srcURL, destURL) {
 }
 
 (async () => {
-	const resp = await fetch(argv.url, {headers: {"User-Agent": userAgent}})
-	const css = await resp.text()
+	let urls = []
+	if (arg.indexOf('https://') == 0) {
+		urls = [arg]
+	}
+	else {
+		let list = await readFile(arg, 'utf8')
+		urls = list.split('\n')
+	}
+
 	try {
 		await access('output')
 	}
@@ -47,5 +58,22 @@ async function downloadFile(srcURL, destURL) {
 		console.log('Creating output directory...')
 		await mkdir('output')
 	}
-	await processCSS(css)
+
+	for (let url of urls) {
+		if (url.indexOf('https://fonts.googleapis.com') != 0) {
+			console.error(`Invalid URL:`, url)
+			continue;
+		}
+
+		console.log('Processing: ', url)
+
+		const resp = await fetch(url, {headers: {"User-Agent": userAgent}})
+		if (resp.status != 200) {
+			console.error('Failed to fetch!')
+			continue;
+		}
+		const css = await resp.text()
+		
+		await processCSS(css)
+	}	
 })()
