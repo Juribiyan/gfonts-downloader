@@ -31,7 +31,7 @@ async function processCSS(css) {
 		css = css.replaceAll(u, fileName)
 		await downloadFile(u, `output/${fileName}`)
 	}
-	await writeFile(`output/${fontName}.css`, css)
+	await writeFile(`output/${fontName.replaceAll(' ', '_')}.css`, css)
 }
 
 async function downloadFile(srcURL, destURL) {
